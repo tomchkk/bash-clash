@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+bash_clash_switches=()
+bash_clash_positionals=()
+
+##
+# Gets the given variable value from the bash_clash_switches array, returning
+# a default value if the variable is not found.
+##
+bash_clash::get() {
+    local name="${1:?"A parameter name to get is required"}"
+    local default="$2"
+    local value
+
+    for switch in ${bash_clash_switches[*]}; do
+        if [[ "$switch" =~ ^"$name"=(.*) ]]; then
+            value="${BASH_REMATCH[1]}" && break
+        fi
+    done
+
+    echo "${value:-$default}"
+}
+
+##
+# Normalises the first given argument
+##
+__bash_clash::normalise_name() {
+    echo "$1" | sed -E 's/^--|^-//' | sed 's/-/_/g'
+}
+
+##
+# Parse given arguments into variables with in the context of the current shell
+# process.
+##
+__bash_clash::parse_arguments() {
+    local switches=()
+    local positionals=()
+    local switch
+    local value
+    local noop
+
+    while [[ $# > 0 ]]; do
+        if [[ "$1" =~ ^- ]]; then
+            if [[ "$1" =~ ^--$ ]]; then
+                # $1 is argument separator '--'; we can just skip ahead
+                noop=:
+            else
+                # here be switches and flags!
+
+                if [[ "$1" =~ ^--?(.+)=(.*)$ ]]; then
+                    # this switch is 'joined' - e.g.: --switch=value
+                    switch="${BASH_REMATCH[1]}" && value="${BASH_REMATCH[2]}"
+                elif [[ "$2" =~ ^([^-]|[^--]) ]]; then
+                    # $2 is a value, rather than a switch identifier, so it
+                    # looks like a separated switch - e.g.: --switch value
+                    switch="$1" && value="$2"
+
+                    shift # consume one additional argument
+                else
+                    # $1 just looks like a flag, which must means it is
+                    # 'truthy', so it should be given a value of true; and a
+                    # flag with a value is basically a switch!
+                    switch="$1" && value=true
+                fi
+
+                switches+=("$(__bash_clash::normalise_name "$switch")="$value"")
+            fi
+        else
+            positionals+=("$1")
+        fi
+
+        shift
+    done
+
+    bash_clash_switches=("${switches[*]}")
+    bash_clash_positionals=("${positionals[*]}")
+}
+
+if [[ "$1" == "--declare-switches" ]]; then
+    __bash_clash::parse_arguments ${@:2} && declare ${bash_clash_switches[*]}
+
+    return 0
+fi
+
+__bash_clash::parse_arguments $@

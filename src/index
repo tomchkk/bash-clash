@@ -34,8 +34,9 @@ __bash_clash::normalise_name() {
 ##
 __bash_clash::parse_arguments() {
     local switches=()
-    local positionals=()
     local switch_open=false
+    local positionals=()
+    local positional_open=false
     local switch
     local value
     local noop
@@ -45,6 +46,7 @@ __bash_clash::parse_arguments() {
             if [[ "$1" =~ ^--$ ]]; then
                 # $1 is argument separator '--'; we just continue
                 switch_open=false
+                positional_open=false
             else
                 # here be switches and flags!
                 switch_open=true
@@ -68,12 +70,18 @@ __bash_clash::parse_arguments() {
                 switches+=("$(__bash_clash::normalise_name "$switch")="$value"")
             fi
         else
+            local head
+
             if $switch_open; then
                 # we're still parsing the last switch, it has space-separated values
                 head=$((${#switches[@]} - 1))
                 switches[$head]="${switches[$head]} $1"
+            elif $positional_open; then
+                head=$((${#positionals[@]} - 1))
+                positionals[$head]="${positionals[$head]} $1"
             else
                 positionals+=("$1")
+                positional_open=true
             fi
         fi
 

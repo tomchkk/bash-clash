@@ -68,8 +68,6 @@ source "$bash_clash" --bar=false
 )
 ```
 
-
-
 ### Positionals
 
 ```

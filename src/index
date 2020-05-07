@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# TODO: add handles to args
+bash_clash_args=()
 bash_clash_all=()
 bash_clash_switches=()
 bash_clash_positionals=()
@@ -23,9 +25,10 @@ bash_clash::get() {
 }
 
 ##
-# Normalises the first given argument
+# Normalises the given argument handle to make it declarable - e.g.:
+# "--arg-name" -> "arg_name"
 ##
-__bash_clash::normalise_name() {
+__bash_clash::normalise_handle() {
     echo "$1" | sed -E 's/^--|^-//' | sed 's/-/_/g'
 }
 
@@ -33,26 +36,30 @@ __bash_clash::normalise_name() {
 # Adds a new element to the switches array.
 ##
 __bash_clash::switches_add() {
-    local element="$(__bash_clash::normalise_name "$1")="$2""
+    local arg="$1=$2"
+    local element="$(__bash_clash::normalise_handle "$1")="$2""
 
-    bash_clash_all+=($element)
-    bash_clash_switches+=($element)
+    bash_clash_args+=("$arg")
+    bash_clash_all+=("$element")
+    bash_clash_switches+=("$element")
 }
 
 ##
 # Adds a new element to the positionals array.
 ##
 __bash_clash::positionals_add() {
-    bash_clash_all+=($1)
-    bash_clash_positionals+=($1)
+    bash_clash_args+=("$1")
+    bash_clash_all+=("$1")
+    bash_clash_positionals+=("$1")
 }
 
 ##
-# Updates the head of the _all_ array.
+# Updates the head of the _args_ and the _all_ arrays.
 ##
 __bash_clash::all_update() {
-    local head=$((${#bash_clash_all[@]} - 1))
+    local head=$((${#bash_clash_args[@]} - 1))
 
+    bash_clash_args[$head]="${bash_clash_args[$head]} $1"
     bash_clash_all[$head]="${bash_clash_all[$head]} $1"
 }
 

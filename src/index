@@ -139,10 +139,15 @@ __bash_clash::parse_arguments() {
     done
 }
 
-if [[ "$1" == "--declare" ]]; then
-    __bash_clash::parse_arguments ${@:2} && declare "${bash_clash_switches[@]}"
+case "$1" in
+    --declare)
+        __bash_clash::parse_arguments ${@:2}
 
-    return 0
-fi
-
-__bash_clash::parse_arguments $@
+        if [[ "${#bash_clash_switches[@]}" -gt 0 ]]; then
+            declare "${bash_clash_switches[@]}"
+        fi
+    ;;
+    *)
+        __bash_clash::parse_arguments $@
+    ;;
+esac

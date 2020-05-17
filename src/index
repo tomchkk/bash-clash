@@ -29,7 +29,7 @@ bash_clash::get() {
 # "--arg-name" -> "arg_name"
 ##
 __bash_clash::normalise_handle() {
-    echo "$1" | sed -E 's/^--|^-//' | sed 's/-/_/g'
+    echo "$1" | sed -E 's/^--|^-//;s/-/_/g'
 }
 
 ##
@@ -94,7 +94,7 @@ __bash_clash::parse_arguments() {
     local value
 
     while [[ $# > 0 ]]; do
-        if [[ "$1" =~ ^- ]]; then
+        if [[ "$1" =~ ^--?\w+ ]]; then
             if [[ "$1" =~ ^--$ ]]; then
                 # $1 is argument separator '--'; we just continue
                 switch_open=false
@@ -119,17 +119,17 @@ __bash_clash::parse_arguments() {
                     switch="$1" && value=true
                 fi
 
-                __bash_clash::switches_add $switch $value
+                __bash_clash::switches_add "$switch" "$value"
             fi
         else
             if $switch_open; then
                 # we're still parsing the last switch, it has space-separated values
-                __bash_clash::switches_update $1
+                __bash_clash::switches_update "$1"
             elif $positional_open; then
                 # we're still parsing the last positionals set, it has space-separated values
-                __bash_clash::positionals_update $1
+                __bash_clash::positionals_update "$1"
             else
-                __bash_clash::positionals_add $1
+                __bash_clash::positionals_add "$1"
 
                 positional_open=true
             fi

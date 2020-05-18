@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+__script="$(readlink "${BASH_SOURCE[0]}" || echo "${BASH_SOURCE[0]}")"
+
+__test_dir="$(cd "$(dirname "$__script")"; pwd)"
+__project_dir="$(dirname "$__test_dir")"
+
+__bash_clash="$__project_dir/src/index"

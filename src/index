@@ -94,7 +94,7 @@ __bash_clash::parse_arguments() {
     local value
 
     while [[ $# > 0 ]]; do
-        if [[ "$1" =~ ^- ]]; then
+        if [[ "$1" =~ ^-(-$|-?[a-zA-Z0-9]+) ]]; then
             if [[ "$1" =~ ^--$ ]]; then
                 # $1 is argument separator '--'; we just continue
                 switch_open=false
@@ -106,17 +106,16 @@ __bash_clash::parse_arguments() {
                 if [[ "$1" =~ ^--?(.+)=(.*)$ ]]; then
                     # this switch is 'joined' - e.g.: --switch=value
                     switch="${BASH_REMATCH[1]}" && value="${BASH_REMATCH[2]}"
-                elif [[ "$2" =~ ^([^-]|[^--]) ]]; then
-                    # $2 is a value, rather than a switch identifier, so it
-                    # looks like a separated switch - e.g.: --switch value
+                elif [[ "$2" =~ ^--?[a-zA-Z0-9]+ ]] || [[ -z "$2" ]]; then
+                    # $2 is a new option handle, or we've reached the end of the
+                    # argument list, so $1 must be a flag, which means it is
+                    # 'truthy' - therefore we'll give it a value of true!
+                    switch="$1" && value=true
+                else
+                    # $2 is the value of the switch indicated by $1
                     switch="$1" && value="$2"
 
                     shift # consume one additional argument
-                else
-                    # $1 just looks like a flag, which must means it is
-                    # 'truthy', so it should be given a value of true; and a
-                    # flag with a value is basically a switch!
-                    switch="$1" && value=true
                 fi
 
                 __bash_clash::switches_add $switch $value

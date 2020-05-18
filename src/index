@@ -29,7 +29,7 @@ bash_clash::get() {
 # "--arg-name" -> "arg_name"
 ##
 __bash_clash::normalise_handle() {
-    echo "$1" | sed -E 's/^--|^-//' | sed 's/-/_/g'
+    echo "$1" | sed -E 's/^--|^-//;s/-/_/g'
 }
 
 ##

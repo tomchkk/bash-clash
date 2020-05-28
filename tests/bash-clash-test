@@ -8,42 +8,42 @@ bash_clash_test::test_parses_flags_switches() {
     source "$__bash_clash" -f
     actual="${bash_clash_switches[@]}"
     expected="f=true"
-    bash_assert::assert_equals "$expected" "$actual"
+    bash_test::assert_equals "$expected" "$actual"
 
     source "$__bash_clash" -f -v
     actual="${bash_clash_switches[@]}"
     expected="f=true v=true"
-    bash_assert::assert_equals "$expected" "$actual"
+    bash_test::assert_equals "$expected" "$actual"
 
     # flags can be negated
     source "$__bash_clash" -f -v=false
     actual="${bash_clash_switches[@]}"
     expected="f=true v=false"
-    bash_assert::assert_equals "$expected" "$actual"
+    bash_test::assert_equals "$expected" "$actual"
 
     # assignment operator is optional
     source "$__bash_clash" -f -v false
     actual="${bash_clash_switches[@]}"
     expected="f=true v=false"
-    bash_assert::assert_equals "$expected" "$actual"
+    bash_test::assert_equals "$expected" "$actual"
 
     # argument handles can be short or long
     source "$__bash_clash" --flag --verify false
     actual="${bash_clash_switches[@]}"
     expected="flag=true verify=false"
-    bash_assert::assert_equals "$expected" "$actual"
+    bash_test::assert_equals "$expected" "$actual"
 
     source "$__bash_clash" -f path/2/file-1 --file=path/2/file-2
     actual="${bash_clash_switches[@]}"
     expected="f=path/2/file-1 file=path/2/file-2"
-    bash_assert::assert_equals "$expected" "$actual"
+    bash_test::assert_equals "$expected" "$actual"
 
     # an argument value can contain spaces
     source "$__bash_clash" --file=path/2/file name --test
     actual="${bash_clash_switches[@]}"
     expected="file=path/2/file name test=true"
-    bash_assert::assert_equals "$expected" "$actual"
-    bash_assert::assert_equals 2 "${#bash_clash_switches[@]}"
+    bash_test::assert_equals "$expected" "$actual"
+    bash_test::assert_equals 2 "${#bash_clash_switches[@]}"
 }
 
 bash_clash_test::test_parses_positionals() {
@@ -52,26 +52,26 @@ bash_clash_test::test_parses_positionals() {
     source "$__bash_clash" positional-value
     actual="${bash_clash_positionals[@]}"
     expected="positional-value"
-    bash_assert::assert_equals "$expected" "$actual"
-    bash_assert::assert_equals 1 "${#bash_clash_positionals[@]}"
+    bash_test::assert_equals "$expected" "$actual"
+    bash_test::assert_equals 1 "${#bash_clash_positionals[@]}"
 
     source "$__bash_clash" positional value with space
     actual="${bash_clash_positionals[@]}"
     expected="positional value with space"
-    bash_assert::assert_equals "$expected" "$actual"
-    bash_assert::assert_equals 1 "${#bash_clash_positionals[@]}"
+    bash_test::assert_equals "$expected" "$actual"
+    bash_test::assert_equals 1 "${#bash_clash_positionals[@]}"
 
     source "$__bash_clash" positional-value-1 -- positional-value-2
     actual="${bash_clash_positionals[@]}"
     expected="positional-value-1 positional-value-2"
-    bash_assert::assert_equals "$expected" "$actual"
-    bash_assert::assert_equals 2 "${#bash_clash_positionals[@]}"
+    bash_test::assert_equals "$expected" "$actual"
+    bash_test::assert_equals 2 "${#bash_clash_positionals[@]}"
 
     source "$__bash_clash" positional value with space -- positional-value-2
     actual="${bash_clash_positionals[@]}"
     expected="positional value with space positional-value-2"
-    bash_assert::assert_equals "$expected" "$actual"
-    bash_assert::assert_equals 2 "${#bash_clash_positionals[@]}"
+    bash_test::assert_equals "$expected" "$actual"
+    bash_test::assert_equals 2 "${#bash_clash_positionals[@]}"
 }
 
 bash_clash_test::test_declares_arguments() {
@@ -79,7 +79,7 @@ bash_clash_test::test_declares_arguments() {
 
     actual="$(source "$__bash_clash" --declare --verify false; echo "$verify")"
     expected="false"
-    bash_assert::assert_equals "$expected" "$actual"
+    bash_test::assert_equals "$expected" "$actual"
 
     # declared argument names are normalized
     actual="$(
@@ -87,7 +87,7 @@ bash_clash_test::test_declares_arguments() {
         echo "$verify_value"
     )"
     expected="test-value"
-    bash_assert::assert_equals "$expected" "$actual"
+    bash_test::assert_equals "$expected" "$actual"
 }
 
 bash_clash_test::test_edge_cases() {
@@ -97,29 +97,29 @@ bash_clash_test::test_edge_cases() {
     source "$__bash_clash" "->"
     actual="${bash_clash_positionals[@]}"
     expected="->"
-    bash_assert::assert_equals "$expected" "$actual"
+    bash_test::assert_equals "$expected" "$actual"
 
     source "$__bash_clash" "--arrow=->"
     actual="${bash_clash_switches[@]}"
     expected="arrow=->"
-    bash_assert::assert_equals "$expected" "$actual"
+    bash_test::assert_equals "$expected" "$actual"
 
     source "$__bash_clash" "--arrow ->"
     actual="${bash_clash_switches[@]}"
     expected="arrow=->"
-    bash_assert::assert_equals "$expected" "$actual"
+    bash_test::assert_equals "$expected" "$actual"
 
     actual="$(source "$__bash_clash" --declare "--arrow=->"; echo "$arrow")"
     expected="->"
-    bash_assert::assert_equals "$expected" "$actual"
+    bash_test::assert_equals "$expected" "$actual"
 
     # maintains spaces in argument values similar to option handles
     source "$__bash_clash" "--arrow= ->"
     actual="${bash_clash_switches[@]}"
     expected="arrow= ->"
-    bash_assert::assert_equals "$expected" "$actual"
+    bash_test::assert_equals "$expected" "$actual"
 
     actual="$(source "$__bash_clash" --declare "--arrow= ->"; echo "$arrow")"
     expected=" ->"
-    bash_assert::assert_equals "$expected" "$actual"
+    bash_test::assert_equals "$expected" "$actual"
 }

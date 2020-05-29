@@ -9,13 +9,16 @@ bash_clash_positionals=()
 ##
 # Gets the given variable value from the bash_clash_switches array, returning
 # a default value if the variable is not found.
+#
+# Calls to bash_clash::get should be encapsulated to ensure values containing
+# spaces are correctly fetched - e.g.: path="$(bash_clash::get "path")"
 ##
 bash_clash::get() {
     local name="${1:?"A parameter name to get is required"}"
     local default="$2"
     local value
 
-    for switch in ${bash_clash_switches[*]}; do
+    for switch in "${bash_clash_switches[@]}"; do
         if [[ "$switch" =~ ^"$name"=(.*) ]]; then
             value="${BASH_REMATCH[1]}" && break
         fi

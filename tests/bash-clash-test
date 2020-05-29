@@ -74,6 +74,23 @@ bash_clash_test::test_parses_positionals() {
     bash_test::assert_equals 2 "${#bash_clash_positionals[@]}"
 }
 
+bash_clash_test::test_get() {
+    local actual expected
+
+    # gets a named parameter
+    source "$__bash_clash" --arg-1 value-1 --arg-2 value-2
+    bash_test::assert_equals "value-1" "$(bash_clash::get "arg_1")"
+    bash_test::assert_equals "value-2" "$(bash_clash::get "arg_2")"
+
+    # gets a named parameter with value spaces
+    source "$__bash_clash" --path "path/2 the/file" --flag
+    actual="${bash_clash_switches[@]}"
+    expected="path=path/2 the/file flag=true"
+    bash_test::assert_equals "$expected" "$actual"
+    bash_test::assert_equals "true" "$(bash_clash::get "flag")"
+    bash_test::assert_equals "path/2 the/file" "$(bash_clash::get "path")"
+}
+
 bash_clash_test::test_declares_arguments() {
     local actual expected
 
@@ -122,4 +139,8 @@ bash_clash_test::test_edge_cases() {
     actual="$(source "$__bash_clash" --declare "--arrow= ->"; echo "$arrow")"
     expected=" ->"
     bash_test::assert_equals "$expected" "$actual"
+
+    # gets a parameter named 'event'
+    source "$__bash_clash" --event "test-event"
+    bash_test::assert_equals "test-event" "$(bash_clash::get "event")"
 }

@@ -4,3 +4,4 @@
 	branch = master
 	super = self
 	dev = true
+	version = ^0.4.3

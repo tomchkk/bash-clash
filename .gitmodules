@@ -1,7 +1,7 @@
-[submodule "tomchkk-private/projects/bash-test"]
-	path = submodules/tomchkk-private/projects/bash-test
-	url = git@gitlab.com:tomchkk-private/projects/bash-test.git
+[submodule "tomchkk/bash-test"]
+	path = submodules/tomchkk/bash-test
+	url = https://github.com/tomchkk/bash-test
 	branch = master
 	super = self
 	dev = true
-	version = ^0.4.3
+	version = ^0.5.0
